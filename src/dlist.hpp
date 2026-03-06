@@ -7,16 +7,16 @@ class DList {
         DList(); // Empty List
         ~DList(); // Delete all nodes
 
-        bool Serialize(const std::string& filename) const;
-        bool Deserialize(const std::string& filename);
+        bool Serialize() const;
+        bool Deserialize();
 
 
     private:
 
         // Position access
-        ListNode* m_head() const;
-        ListNode* m_tail() const;
-        int m_size() const;
+        ListNode* m_get_head() const;
+        ListNode* m_get_tail() const;
+        int m_get_size() const;
 
 
         // Insert
@@ -38,16 +38,23 @@ class DList {
         void m_print_forward() const; 
         void m_print_backward() const;
 
+        // File 
+        bool m_read_file(const std::string& filename);
+        bool m_write_file(const std::string& filename) const;
+        void m_set_file_path(const std::string& filename);
+
 
         /*
 
         */
-        ListNode* m_head = nullptr;
-        ListNode* m_tail = nullptr;
-        ListNode* m_temp = nullptr;
-        ListNode* m_first = nullptr;
+        ListNode* m_head;
+        ListNode* m_tail;
+        ListNode* m_temp;
+        ListNode* m_first;
 
         int m_size = 0;
+
+        std::string m_file_full_path;
 };
 
 #endif // DLIST_HPP
