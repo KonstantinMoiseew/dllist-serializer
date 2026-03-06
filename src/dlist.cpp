@@ -34,6 +34,8 @@ bool DList::Serialize()
 
     this->m_print_forward();
 
+    this->m_print_backward();
+
     return true;
 
 }
@@ -46,16 +48,18 @@ bool DList::Deserialize()
 */
 
 // Position access
-ListNode* DList::m_get_head() const
-{}
-ListNode* DList::m_get_tail() const
-{}
-int DList::m_get_size() const
-{}
+ListNode* DList::m_get_head() const {
+    return m_head;
+}
+ListNode* DList::m_get_tail() const {
+    return m_tail;
+}
+int DList::m_get_size() const {
+    return m_size;
+}
 
 // Insert
-void DList::m_append(const std::string& data)
-{
+void DList::m_append(const std::string& data) {
     ListNode* newNode = new ListNode();
     newNode->data = data;
     newNode->next = nullptr;
@@ -74,8 +78,7 @@ void DList::m_append(const std::string& data)
     }
     m_size++;
 }
-void DList::m_prepend(const std::string& data)
-{
+void DList::m_prepend(const std::string& data) {
     ListNode* newNode = new ListNode();
     newNode->data = data;
     newNode->next = nullptr;
@@ -101,8 +104,7 @@ void DList::m_insert_before(const std::string& data, int pos)
 {}
 
 // Remove
-void DList::m_remove_head()
-{
+void DList::m_remove_head() {
     if(m_head == nullptr) 
     {
         std::cout << "Can not remove! The list is empty." << std::endl;
@@ -120,8 +122,7 @@ void DList::m_remove_head()
     m_size--;
     delete m_temp;
 }
-void DList::m_remove_tail()
-{
+void DList::m_remove_tail() {
     if(m_head == nullptr) 
     {
         std::cout << "Can not remove! The list is empty." << std::endl;
@@ -140,8 +141,7 @@ void DList::m_remove_tail()
     m_size--;
     delete m_temp;
 }
-void DList::m_remove_position(int pos)
-{
+void DList::m_remove_position(int pos) {
     // If invalid position
     if (pos < 1 || pos > m_size) {
         std::cout <<"Please enter a valid position" << std::endl;
@@ -181,8 +181,7 @@ ListNode* DList::m_go_to(int pos)
 {}  
 
 // Traversal helpers
-void DList::m_print_forward() const
-{
+void DList::m_print_forward() const {
     if(m_head == nullptr)
     {
         std::cout << "List is empty" << std::endl;
@@ -193,8 +192,18 @@ void DList::m_print_forward() const
     current = current->next;
     }
 }
-void DList::m_print_backward() const
-{}
+void DList::m_print_backward() const {
+    if(m_head == nullptr)
+    {
+        std::cout << "List is empty" << std::endl;
+    }
+    ListNode* current = m_tail;
+    while (current != nullptr) {
+    std::cout << current->data << std::endl;
+    current = current->prev;
+    }
+
+}
 
 bool DList::m_read_file(const std::string& filename)
 {}
