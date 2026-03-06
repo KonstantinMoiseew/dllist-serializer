@@ -7,7 +7,7 @@ class DList {
         DList(); // Empty List
         ~DList(); // Delete all nodes
 
-        bool Serialize() const;
+        bool Serialize();
         bool Deserialize();
 
 
@@ -20,15 +20,15 @@ class DList {
 
 
         // Insert
-        void m_append(std::string& data);
-        void m_prepend(std::string& data);
-        void m_insert_after(std::string& data, int pos);
-        void m_insert_before(std::string& data, int pos);
+        void m_append(const std::string& data);
+        void m_prepend(const std::string& data);
+        void m_insert_after(const std::string& data, int pos);
+        void m_insert_before(const std::string& data, int pos);
 
         // Remove
         void m_remove_head();
         void m_remove_tail();
-        void m_remove_poition(int pos);
+        void m_remove_position(int pos);
 
         // Search/position
         ListNode* m_find(const std::string& data);  
