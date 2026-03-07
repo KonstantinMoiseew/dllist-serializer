@@ -20,10 +20,10 @@ class DList {
 
 
         // Insert
-        void m_append(const std::string& data);
-        void m_prepend(const std::string& data);
-        void m_insert_after(const std::string& data, int pos);
-        void m_insert_before(const std::string& data, int pos);
+        void m_append(const std::string& data, ListNode* node = nullptr);
+        void m_prepend(const std::string& data, ListNode* node = nullptr);
+        void m_insert_after(const std::string& data, int pos, ListNode* node = nullptr);
+        void m_insert_before(const std::string& data, int pos, ListNode* node = nullptr);
 
         // Remove
         void m_remove_head();

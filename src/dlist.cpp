@@ -76,9 +76,10 @@ int DList::m_get_size() const {
 }
 
 // Insert
-void DList::m_append(const std::string& data) {
+void DList::m_append(const std::string& data, ListNode* node) {
     ListNode* newNode = new ListNode();
     newNode->data = data;
+    newNode->rand = node;
     newNode->next = nullptr;
     newNode->prev = nullptr;
     if(m_head == nullptr)
@@ -95,9 +96,10 @@ void DList::m_append(const std::string& data) {
     }
     m_size++;
 }
-void DList::m_prepend(const std::string& data) {
+void DList::m_prepend(const std::string& data, ListNode* node) {
     ListNode* newNode = new ListNode();
     newNode->data = data;
+    newNode->rand = node;
     newNode->next = nullptr;
     newNode->prev = nullptr;
     if(m_head == nullptr){
@@ -112,7 +114,7 @@ void DList::m_prepend(const std::string& data) {
     }
     m_size++;
 }
-void DList::m_insert_after(const std::string& data, int pos)
+void DList::m_insert_after(const std::string& data, int pos, ListNode* node)
 {
     m_temp = this->m_go_to(pos);
     if(!m_temp){
@@ -120,6 +122,7 @@ void DList::m_insert_after(const std::string& data, int pos)
     }
     ListNode* newNode = new ListNode();
     newNode->data = data;
+    newNode->rand = node;
     newNode->next = nullptr;
     newNode->prev = nullptr;
 
@@ -137,13 +140,14 @@ void DList::m_insert_after(const std::string& data, int pos)
 
 }
 
-void DList::m_insert_before(const std::string& data, int pos){
+void DList::m_insert_before(const std::string& data, int pos, ListNode* node){
     m_temp = this->m_go_to(pos);
     if(!m_temp){
         return;
     }
     ListNode* newNode = new ListNode();
     newNode->data = data;
+    newNode->rand = node;
     newNode->next = nullptr;
     newNode->prev = nullptr;
 
