@@ -54,6 +54,8 @@ class DList {
         int m_size = 0;
 
         std::string m_file_full_path;
+
+        static constexpr size_t MAX_NODES = 1000000; 
 };
 
 #endif // DLIST_HPP

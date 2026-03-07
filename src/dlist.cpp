@@ -98,6 +98,7 @@ bool DList::Deserialize(){
             rand_idx = std::stoi(index_str);
         } catch (const std::exception& e) {
             std::cerr << "Invalid index '" << index_str << "': " << e.what() <<" of data: " << data << std::endl;
+            std::cout << "Проверьте правильность формата входного файла. " << std::endl;
             rand_idx = -1;
         }
 
@@ -134,6 +135,11 @@ int DList::m_get_size() const {
 
 // Insert
 void DList::m_append(const std::string& data, ListNode* node) {
+
+    if (m_size >= MAX_NODES) {
+        std::cerr << "ERROR: Maximum nodes limit reached (" << MAX_NODES << ")\n";
+        return;  // Не добавляем больше узлов
+    }
     ListNode* newNode = new ListNode();
     newNode->data = data;
     newNode->rand = node;
@@ -154,6 +160,12 @@ void DList::m_append(const std::string& data, ListNode* node) {
     m_size++;
 }
 void DList::m_prepend(const std::string& data, ListNode* node) {
+
+    if (m_size >= MAX_NODES) {
+        std::cerr << "ERROR: Maximum nodes limit reached (" << MAX_NODES << ")\n";
+            return;  // Не добавляем больше узлов
+    }
+
     ListNode* newNode = new ListNode();
     newNode->data = data;
     newNode->rand = node;
@@ -173,6 +185,11 @@ void DList::m_prepend(const std::string& data, ListNode* node) {
 }
 void DList::m_insert_after(const std::string& data, int pos, ListNode* node)
 {
+    if (m_size >= MAX_NODES) {
+        std::cerr << "ERROR: Maximum nodes limit reached (" << MAX_NODES << ")\n";
+        return;  // Не добавляем больше узлов
+    }
+    
     m_temp = this->m_go_to(pos);
     if(!m_temp){
         return;
@@ -198,6 +215,11 @@ void DList::m_insert_after(const std::string& data, int pos, ListNode* node)
 }
 
 void DList::m_insert_before(const std::string& data, int pos, ListNode* node){
+
+    if (m_size >= MAX_NODES) {
+        std::cerr << "ERROR: Maximum nodes limit reached (" << MAX_NODES << ")\n";
+        return;  // Не добавляем больше узлов
+    }
     m_temp = this->m_go_to(pos);
     if(!m_temp){
         return;
