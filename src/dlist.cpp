@@ -12,13 +12,22 @@ DList::DList(): m_head(nullptr)
             , m_first(nullptr)
             , m_size(0){
     std::error_code ec;
-    std::filesystem::path canonical_path = std::filesystem::canonical("./res/inlet.in", ec);
+    std::filesystem::path canonical_path_in = std::filesystem::canonical("./res/inlet.in", ec);
     if (ec) {
         std::cerr << "Canonical failed: " << ec.message() << std::endl;
-        m_file_full_path = "../res/inlet.in";  // Fallback
+        m_file_in_full_path = "../res/inlet.in";  // Fallback
     } else {
-        m_file_full_path = canonical_path.string();
+        m_file_in_full_path = canonical_path_in.string();
     }
+
+    std::filesystem::path canonical_path_out = std::filesystem::canonical("./res/outlet.out", ec);
+    if (ec) {
+        std::cerr << "Canonical failed: " << ec.message() << std::endl;
+        m_file_out_full_path = "../res/outlet.out";  // Fallback
+    } else {
+        m_file_out_full_path = canonical_path_out.string();
+    }
+    
     std::cout << "Working dir: " << std::filesystem::current_path() << std::endl; //working dir (pwd) inherits from parent process.
 }
 
@@ -36,50 +45,58 @@ DList::~DList()
 bool DList::Serialize()
 {
 
-    /*
-    this->m_prepend("apple");
-    this->m_prepend("banana");
-    this->m_prepend("nut");
-    this->m_append("icecream");
+    std::cout << "File output: " << m_file_out_full_path << std::endl;
+    std::fstream file(m_file_out_full_path);
+    if (!file.is_open()) {
+        std::cerr << "Failed to open " << m_file_out_full_path << std::endl;
+        return false;
+    }
 
-    ListNode* node = this->m_go_to(3);
-    std::cout << "ListNode[3]: " << node->data << std::endl;
-    node = m_find("nut");
-    std::cout << "ListNode with a certain data nut: " << node->data << std::endl;
-    this->m_print_forward();
-    m_insert_after("milk", 2);
-    std::cout << "###### forward: " << std::endl;
-    this->m_print_forward();
-    std::cout << "###### backward: " << std::endl;
-    this->m_print_backward();
-    std::cout << "#######" << std::endl;
+    uint32_t size = m_get_size();
+    file.write(reinterpret_cast<const char*>(&size), sizeof(size));
 
-    std::cout << "Insertion before:  " << std::endl;
-    this->m_insert_before("bread", 3);
-    std::cout << "###### forward: " << std::endl;
-    this->m_print_forward();
-    std::cout << "#######" << std::endl;
-
-
-    this->m_remove_position(2);
-
-    this->m_print_forward();
-
-    this->m_print_backward();
-    */
-
-
-    this->m_print_forward();
+    // Проходим по списку и сериализуем каждый узел
+    ListNode* current = m_get_head();
+    for (uint32_t i = 0; i < size && current; ++i, current = current->next) {
+        // data: длина строки (uint32_t) + строка (UTF-8)
+        uint32_t data_len = current->data.length();
+        file.write(reinterpret_cast<const char*>(&data_len), sizeof(data_len));
+        file.write(current->data.c_str(), data_len);
+        
+        // rand_index: int32_t (-1 для nullptr)
+        int32_t rand_idx = -1;
+        if (current->rand) {
+            // Находим индекс узла на который указывает rand
+            ListNode* temp = m_get_head();
+            for (int32_t j = 0; j < m_get_size() && temp; ++j, temp = temp->next) {
+                if (temp == current->rand) {
+                    rand_idx = j;
+                    break;
+                }
+            }
+        }
+        file.write(reinterpret_cast<const char*>(&rand_idx), sizeof(rand_idx));
+    }
+    if (!file) {
+        std::cerr << "Write error during serialization\n";
+        return false;
+    }
+    
+    std::cout << "Serialized " << size << " nodes to outlet.out\n";
 
     return true;
 
 }
 
 bool DList::Deserialize(){
-    std::cout << "File: " << m_file_full_path << std::endl;
-    std::fstream file(m_file_full_path);
+
+}
+
+bool DList::ReadFileIn(){
+    std::cout << "File input: " << m_file_in_full_path << std::endl;
+    std::fstream file(m_file_in_full_path);
     if (!file.is_open()) {
-    std::cerr << "Failed to open " << m_file_full_path << std::endl;
+    std::cerr << "Failed to open " << m_file_in_full_path << std::endl;
     return false;
     }
 
@@ -421,7 +438,11 @@ bool DList::m_read_file(const std::string& filename){
 bool DList::m_write_file(const std::string& filename) const
 {}
 
-void DList::Set_file_path(const std::string& filename){
-    m_file_full_path = filename;
+void DList::Set_file_in_path(const std::string& filename){
+    m_file_in_full_path = filename;
+}
+
+void DList::Set_file_out_path(const std::string& filename){
+    m_file_out_full_path = filename;
 }
 

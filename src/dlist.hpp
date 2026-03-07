@@ -9,7 +9,9 @@ class DList {
 
         bool Serialize();
         bool Deserialize();
-        void Set_file_path(const std::string& filename);
+        bool ReadFileIn();
+        void Set_file_in_path(const std::string& filename);
+        void Set_file_out_path(const std::string& filename);
 
 
     private:
@@ -53,7 +55,8 @@ class DList {
 
         int m_size = 0;
 
-        std::string m_file_full_path;
+        std::string m_file_in_full_path;
+        std::string m_file_out_full_path;
 
         static constexpr size_t MAX_NODES = 1000000; 
 };
