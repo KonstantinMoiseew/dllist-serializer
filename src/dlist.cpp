@@ -89,7 +89,7 @@ bool DList::Serialize()
 }
 
 bool DList::Deserialize(){
-
+    return true;
 }
 
 bool DList::ReadFileIn(){
@@ -198,6 +198,10 @@ void DList::m_append(const std::string& data, ListNode* node) {
         std::cerr << "ERROR: Maximum nodes limit reached (" << MAX_NODES << ")\n";
         return;  // Не добавляем больше узлов
     }
+    if(data.length() >= MAX_LENGTH){
+        std::cerr << "ERROR: Maximum data length limit reached (" << MAX_LENGTH << ")\n";
+        return;  // Не добавляем больше узлов
+    }
     ListNode* newNode = new ListNode();
     newNode->data = data;
     newNode->rand = node;
@@ -223,6 +227,10 @@ void DList::m_prepend(const std::string& data, ListNode* node) {
         std::cerr << "ERROR: Maximum nodes limit reached (" << MAX_NODES << ")\n";
             return;  // Не добавляем больше узлов
     }
+    if(data.length() >= MAX_LENGTH){
+        std::cerr << "ERROR: Maximum data length limit reached (" << MAX_LENGTH << ")\n";
+        return;  // Не добавляем больше узлов
+    }
 
     ListNode* newNode = new ListNode();
     newNode->data = data;
@@ -245,6 +253,11 @@ void DList::m_insert_after(const std::string& data, int pos, ListNode* node)
 {
     if (m_size >= MAX_NODES) {
         std::cerr << "ERROR: Maximum nodes limit reached (" << MAX_NODES << ")\n";
+        return;  // Не добавляем больше узлов
+    }
+
+    if(data.length() >= MAX_LENGTH){
+        std::cerr << "ERROR: Maximum data length limit reached (" << MAX_LENGTH << ")\n";
         return;  // Не добавляем больше узлов
     }
     
@@ -276,6 +289,10 @@ void DList::m_insert_before(const std::string& data, int pos, ListNode* node){
 
     if (m_size >= MAX_NODES) {
         std::cerr << "ERROR: Maximum nodes limit reached (" << MAX_NODES << ")\n";
+        return;  // Не добавляем больше узлов
+    }
+    if(data.length() >= MAX_LENGTH){
+        std::cerr << "ERROR: Maximum data length limit reached (" << MAX_LENGTH << ")\n";
         return;  // Не добавляем больше узлов
     }
     m_temp = this->m_go_to(pos);
@@ -432,11 +449,12 @@ void DList::m_print_backward() const {
 }
 
 bool DList::m_read_file(const std::string& filename){
-
+    return true;
 }
 
-bool DList::m_write_file(const std::string& filename) const
-{}
+bool DList::m_write_file(const std::string& filename) const{
+    return true;
+}
 
 void DList::Set_file_in_path(const std::string& filename){
     m_file_in_full_path = filename;
