@@ -28,7 +28,24 @@ bool DList::Serialize()
     this->m_prepend("nut");
     this->m_append("icecream");
 
+    ListNode* node = this->m_go_to(3);
+    std::cout << "ListNode[3]: " << node->data << std::endl;
+    node = m_find("nut");
+    std::cout << "ListNode with a certain data nut: " << node->data << std::endl;
     this->m_print_forward();
+    m_insert_after("milk", 2);
+    std::cout << "###### forward: " << std::endl;
+    this->m_print_forward();
+    std::cout << "###### backward: " << std::endl;
+    this->m_print_backward();
+    std::cout << "#######" << std::endl;
+
+    std::cout << "Insertion before:  " << std::endl;
+    this->m_insert_before("bread", 3);
+    std::cout << "###### forward: " << std::endl;
+    this->m_print_forward();
+    std::cout << "#######" << std::endl;
+
 
     this->m_remove_position(2);
 
@@ -83,14 +100,12 @@ void DList::m_prepend(const std::string& data) {
     newNode->data = data;
     newNode->next = nullptr;
     newNode->prev = nullptr;
-    if(m_head == nullptr)
-    {
+    if(m_head == nullptr){
         m_first = newNode;
         m_head = newNode;
         m_tail = newNode;
     }
-    else
-    {
+    else{
         m_head->prev = newNode;
         newNode->next = m_head;
         m_head = newNode;
@@ -98,10 +113,52 @@ void DList::m_prepend(const std::string& data) {
     m_size++;
 }
 void DList::m_insert_after(const std::string& data, int pos)
-{}
+{
+    m_temp = this->m_go_to(pos);
+    if(!m_temp){
+        return;
+    }
+    ListNode* newNode = new ListNode();
+    newNode->data = data;
+    newNode->next = nullptr;
+    newNode->prev = nullptr;
 
-void DList::m_insert_before(const std::string& data, int pos)
-{}
+    newNode->prev = m_temp;
+    newNode->next = m_temp->next;
+    m_temp->next = newNode;
+
+    if(newNode->next != nullptr){
+        newNode->next->prev = newNode;
+    }
+    else{
+        m_tail = newNode;
+    }
+    m_size++;
+
+}
+
+void DList::m_insert_before(const std::string& data, int pos){
+    m_temp = this->m_go_to(pos);
+    if(!m_temp){
+        return;
+    }
+    ListNode* newNode = new ListNode();
+    newNode->data = data;
+    newNode->next = nullptr;
+    newNode->prev = nullptr;
+
+    newNode->prev = m_temp->prev;
+    newNode->next = m_temp;
+    m_temp->prev = newNode;
+
+    if(newNode->prev != nullptr){
+        newNode->prev->next = newNode;
+    }
+    else{
+        m_head = newNode;
+    }
+    m_size++;
+}
 
 // Remove
 void DList::m_remove_head() {
@@ -150,20 +207,17 @@ void DList::m_remove_position(int pos) {
     else if(pos == 1) {
         m_remove_head();
     }
-    
-
     else if(pos == m_size) { 
         m_remove_tail();
-    }
-    
+    }  
     else {
         m_first = m_head;
         while(pos-- > 1) {
             m_first = m_first->next;
-        }
-        if(m_first == nullptr) { 
+            if(m_first == nullptr) { 
             std::cout << "There is no node " << std::endl;
             return;
+            }
         }
         ListNode* prev = m_first->prev;
         ListNode* next = m_first->next;
@@ -175,10 +229,40 @@ void DList::m_remove_position(int pos) {
 }
 
 // Search/position
-ListNode* DList::m_find(const std::string& data)
-{} 
-ListNode* DList::m_go_to(int pos)
-{}  
+ListNode* DList::m_find(const std::string& data){
+    if (m_head == nullptr) {
+        std::cout <<"DList is empty" << std::endl;
+        return nullptr;
+    }  
+    m_first = m_head;
+    while(m_first){
+        if(m_first->data == data) return m_first;
+        m_first = m_first->next;
+    }   
+    return nullptr; 
+} 
+
+ListNode* DList::m_go_to(int pos){
+    if (pos < 1 || pos > m_size) {
+        std::cout <<"Please enter a valid position" << std::endl;
+        return nullptr;
+    }  
+    if(pos == m_size){
+        return m_tail;
+    } 
+    if(pos == 1){
+        return m_head;
+    }   
+    m_first = m_head;
+    while(pos-- > 1){
+        m_first = m_first->next;
+        if(m_first == nullptr){
+            std::cout << "There is no such a node. " << std::endl;
+            return m_first;
+        }
+    }   
+    return m_first; 
+}  
 
 // Traversal helpers
 void DList::m_print_forward() const {
