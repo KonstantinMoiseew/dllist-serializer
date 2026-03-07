@@ -44,7 +44,7 @@ CMake не ниже 3.20 версии.
 
 ## Порядок сборки.
 Склонировать проект `git clone https://github.com/KonstantinMoiseew/dllist-serializer.git`
-Перейти в дирректорию dllist-serializer 'cd current_dir/dllist-serializer'
+Перейти в дирректорию dllist-serializer `cd current_dir/dllist-serializer`  
 Сконфигурировать проект: `cmake -S . -B ./build -DCMAKE_BUILD_TYPE=Release -G Ninja`
 Собрать проект: `cmake --build ./build`
 
