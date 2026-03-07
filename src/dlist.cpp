@@ -4,6 +4,7 @@
 #include <sstream>
 #include <vector>
 #include <filesystem>
+#include <algorithm>
 
 DList::DList(): m_head(nullptr)
             , m_tail(nullptr)
@@ -83,34 +84,74 @@ bool DList::Deserialize(){
     }
 
     std::string line;
+    int line_number = 0;
     std::vector<int> rand_nodes;
     while (std::getline(file, line)) {
-        if (line.empty()) continue;
+        line_number++;
+        if (line.empty()) {
+            std::cout << "Line " << line_number << ": empty line skipped" << std::endl;
+            continue;
+        }
     
         std::istringstream iss(line);
         std::string data, index_str;
         if (!std::getline(iss, data, ';') || !std::getline(iss, index_str, ';')) {
+            std::cerr << "Line " << line_number << " WRONG FORMAT (need data;index): '" 
+                      << line << std::endl;
+            std::cout << "Проверьте правильность формата входного файла.\n";
             continue; 
+        }
+
+        // УДАЛЯЕМ ЛИШНИЕ СИМВОЛЫ ИЗ index_str
+        index_str.erase(std::remove_if(index_str.begin(), index_str.end(), ::isspace), index_str.end());
+
+        if (index_str.empty()) {
+            std::cerr << "Line " << line_number << " EMPTY INDEX after ';': '" << line << std::endl;
+            std::cout << "Проверьте правильность формата входного файла." << std::endl;
+            continue;
         }
     
         int rand_idx;
         try {
             rand_idx = std::stoi(index_str);
+            
+            // rand_idx должен быть в правильном диапазоне (0..10^6)
+            if (rand_idx < -1 || rand_idx >= 1000000) {  // Больше MAX_NODES
+                std::cerr << "Line " << line_number << " INDEX OUT OF RANGE: " << rand_idx << std::endl;
+                std::cout << "Проверьте правильность формата входного файла." << std::endl;
+                continue;
+            }
+            
         } catch (const std::exception& e) {
-            std::cerr << "Invalid index '" << index_str << "': " << e.what() <<" of data: " << data << std::endl;
-            std::cout << "Проверьте правильность формата входного файла. " << std::endl;
-            rand_idx = -1;
+            std::cerr << "Line " << line_number << " INVALID INDEX '" << index_str 
+                      << "' for data '" << data << "': " << e.what() << std::endl;
+            std::cout << "Проверьте правильность формата входного файла." << std::endl;
+            continue;  // НЕ добавляем узел!
         }
 
         rand_nodes.push_back(rand_idx);
 
         m_append(data);
+
+        if (rand_nodes.size() != static_cast<size_t>(m_get_size())) {
+            std::cerr << "ERROR: parsed " << rand_nodes.size() 
+                  << " valid lines, but m_size = " << m_get_size() << std::endl;
+            return false;
+        }
     }
     ListNode* node = nullptr;
     for (int i = 0; i < rand_nodes.size(); i++){
         node = m_go_to(i);
-        if(rand_nodes[i] != -1)
+        if(node == nullptr){
+            std::cout << " Line: " << i << std::endl;
+        }
+        if(rand_nodes[i] != -1){
             node->rand = m_go_to(rand_nodes[i]);
+            if(node->rand == nullptr){
+                std::cout << "Position in dlist: " << i << std::endl;
+            }
+        }
+            
         else
             node->rand = nullptr;
 
@@ -327,7 +368,7 @@ ListNode* DList::m_find(const std::string& data){
 
 ListNode* DList::m_go_to(int pos){
     if (pos < 0 || pos > m_size - 1) {
-        std::cout <<"Please enter a valid position (from 0 to )" << m_size-1 << ")"  << std::endl;
+        std::cout <<"Please enter a valid position (from 0 to " << m_size-1 << ")"  << " Pos for rand: " << pos << std::endl;
         return nullptr;
     }  
     if(pos == m_size - 1){
