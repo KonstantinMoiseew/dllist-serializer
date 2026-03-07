@@ -43,10 +43,10 @@ CMake не ниже 3.20 версии.
 Сборочная система Ninja или make.
 
 ## Порядок сборки.
-Склонировать проект 'git clone https://github.com/KonstantinMoiseew/dllist-serializer.git'
+Склонировать проект `git clone https://github.com/KonstantinMoiseew/dllist-serializer.git`
 Перейти в дирректорию dllist-serializer 'cd current_dir/dllist-serializer'
-Сконфигурировать проект: 'cmake -S . -B ./build -DCMAKE_BUILD_TYPE=Release -G Ninja'
-Собрать проект: 'cmake --build ./build'
+Сконфигурировать проект: `cmake -S . -B ./build -DCMAKE_BUILD_TYPE=Release -G Ninja`
+Собрать проект: `cmake --build ./build`
 
 ## Запустить проект:
-Из той же директории выполнить: './build/dlinked_list_serial'
+Из той же директории выполнить: `./build/dlinked_list_serial`
