@@ -204,19 +204,19 @@ void DList::m_remove_tail() {
 }
 void DList::m_remove_position(int pos) {
     // If invalid position
-    if (pos < 1 || pos > m_size) {
-        std::cout <<"Please enter a valid position" << std::endl;
+    if (pos < 0 || pos >= m_size) {
+        std::cout <<"Please enter a valid position (from 0 to )" << m_size-1 << ")"  << std::endl;
     }
 
-    else if(pos == 1) {
+    else if(pos == 0) {
         m_remove_head();
     }
-    else if(pos == m_size) { 
+    else if(pos == m_size - 1) { 
         m_remove_tail();
     }  
     else {
         m_first = m_head;
-        while(pos-- > 1) {
+        while(pos-- > 0) {
             m_first = m_first->next;
             if(m_first == nullptr) { 
             std::cout << "There is no node " << std::endl;
@@ -247,18 +247,18 @@ ListNode* DList::m_find(const std::string& data){
 } 
 
 ListNode* DList::m_go_to(int pos){
-    if (pos < 1 || pos > m_size) {
-        std::cout <<"Please enter a valid position" << std::endl;
+    if (pos < 0 || pos > m_size - 1) {
+        std::cout <<"Please enter a valid position (from 0 to )" << m_size-1 << ")"  << std::endl;
         return nullptr;
     }  
-    if(pos == m_size){
+    if(pos == m_size - 1){
         return m_tail;
     } 
-    if(pos == 1){
+    if(pos == 0){
         return m_head;
     }   
     m_first = m_head;
-    while(pos-- > 1){
+    while(pos-- > 0){
         m_first = m_first->next;
         if(m_first == nullptr){
             std::cout << "There is no such a node. " << std::endl;
