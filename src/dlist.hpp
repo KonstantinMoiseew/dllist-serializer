@@ -9,6 +9,7 @@ class DList {
 
         bool Serialize();
         bool Deserialize();
+        void Set_file_path(const std::string& filename);
 
 
     private:
@@ -41,9 +42,7 @@ class DList {
         // File 
         bool m_read_file(const std::string& filename);
         bool m_write_file(const std::string& filename) const;
-        void m_set_file_path(const std::string& filename);
-
-
+        
         /*
 
         */

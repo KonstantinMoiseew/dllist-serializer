@@ -1,13 +1,25 @@
 #include "dlist.hpp"
 #include <iostream>
+#include <fstream>
+#include <sstream>
+#include <vector>
+#include <filesystem>
 
 DList::DList(): m_head(nullptr)
             , m_tail(nullptr)
             , m_temp(nullptr)
             , m_first(nullptr)
-            , m_size(0)
-            , m_file_full_path("")
-{}
+            , m_size(0){
+    std::error_code ec;
+    std::filesystem::path canonical_path = std::filesystem::canonical("./res/inlet.in", ec);
+    if (ec) {
+        std::cerr << "Canonical failed: " << ec.message() << std::endl;
+        m_file_full_path = "../res/inlet.in";  // Fallback
+    } else {
+        m_file_full_path = canonical_path.string();
+    }
+    std::cout << "Working dir: " << std::filesystem::current_path() << std::endl; //working dir (pwd) inherits from parent process.
+}
 
 
 DList::~DList() 
@@ -23,6 +35,7 @@ DList::~DList()
 bool DList::Serialize()
 {
 
+    /*
     this->m_prepend("apple");
     this->m_prepend("banana");
     this->m_prepend("nut");
@@ -52,13 +65,50 @@ bool DList::Serialize()
     this->m_print_forward();
 
     this->m_print_backward();
+    */
+
+
+    this->m_print_forward();
 
     return true;
 
 }
 
-bool DList::Deserialize()
-{}
+bool DList::Deserialize(){
+    std::cout << "File: " << m_file_full_path << std::endl;
+    std::fstream file(m_file_full_path);
+    if (!file.is_open()) {
+    std::cerr << "Failed to open " << m_file_full_path << std::endl;
+    return false;
+    }
+
+    std::string line;
+    std::vector<int> rand_nodes;
+    while (std::getline(file, line)) {
+        if (line.empty()) continue;
+    
+        std::istringstream iss(line);
+        std::string data, index_str;
+        if (!std::getline(iss, data, ';') || !std::getline(iss, index_str, ';')) {
+            continue; 
+        }
+    
+        int rand_idx = std::stoi(index_str);
+        rand_nodes.push_back(rand_idx);
+
+        m_append(data);
+    }
+    ListNode* node = nullptr;
+    for (int i = 0; i < rand_nodes.size(); i++){
+        node = m_go_to(i);
+        if(rand_nodes[i] != -1)
+            node->rand = m_go_to(rand_nodes[i]);
+        else
+            node->rand = nullptr;
+
+    }
+    return true;
+}
 
 /*
     Private Methods
@@ -205,7 +255,7 @@ void DList::m_remove_tail() {
 void DList::m_remove_position(int pos) {
     // If invalid position
     if (pos < 0 || pos >= m_size) {
-        std::cout <<"Please enter a valid position (from 0 to )" << m_size-1 << ")"  << std::endl;
+        std::cout <<"Please enter a valid position (from 0 to " << m_size-1 << ")"  << std::endl;
     }
 
     else if(pos == 0) {
@@ -276,8 +326,9 @@ void DList::m_print_forward() const {
     }
     ListNode* current = m_head;
     while (current != nullptr) {
-    std::cout << current->data << std::endl;
-    current = current->next;
+        std::cout << current->data << std::endl;
+        std::cout << "Rand: " << current->rand << std::endl;
+        current = current->next;
     }
 }
 void DList::m_print_backward() const {
@@ -293,12 +344,14 @@ void DList::m_print_backward() const {
 
 }
 
-bool DList::m_read_file(const std::string& filename)
-{}
+bool DList::m_read_file(const std::string& filename){
+
+}
 
 bool DList::m_write_file(const std::string& filename) const
 {}
 
-void DList::m_set_file_path(const std::string& filename)
-{}
+void DList::Set_file_path(const std::string& filename){
+    m_file_full_path = filename;
+}
 
