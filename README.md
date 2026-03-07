@@ -49,4 +49,5 @@ CMake не ниже 3.20 версии.
 Собрать проект: `cmake --build ./build`
 
 ## Запустить проект:
-Из той же директории выполнить: `./build/dlinked_list_serial`
+Из той же директории выполнить: `./build/dlinked_list_serial -in relative_path_to/input_file -out relative_path_to/output_file`
+где после параметров -in и -out идут относительные или полные пути к входному и выходному файлу (относительно рабочей дирректории). По умолчанию значения путей ./res/inlet.in и ./res/outlet.out.
