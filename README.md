@@ -1,3 +1,5 @@
+## Описание задачи.
+
 Сериализация двусвязного списка с произвольными ссылками
 1. Задача
 struct ListNode { // ListNode модифицировать нельзя
@@ -34,3 +36,17 @@ carrot;1
 4. Ограничения
  - Максимальное число узлов: 10⁶
 - data может быть длиной до 1000 символов
+
+## Необходимые инструменты для сборки проекта.
+CMake не ниже 3.20 версии.
+Компилятор clang или gcc.
+Сборочная система Ninja или make.
+
+## Порядок сборки.
+Склонировать проект 'git clone https://github.com/KonstantinMoiseew/dllist-serializer.git'
+Перейти в дирректорию dllist-serializer 'cd current_dir/dllist-serializer'
+Сконфигурировать проект: 'cmake -S . -B ./build -DCMAKE_BUILD_TYPE=Release -G Ninja'
+Собрать проект: 'cmake --build ./build'
+
+## Запустить проект:
+Из той же директории выполнить: './build/dlinked_list_serial'
