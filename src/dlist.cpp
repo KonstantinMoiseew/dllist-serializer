@@ -93,7 +93,14 @@ bool DList::Deserialize(){
             continue; 
         }
     
-        int rand_idx = std::stoi(index_str);
+        int rand_idx;
+        try {
+            rand_idx = std::stoi(index_str);
+        } catch (const std::exception& e) {
+            std::cerr << "Invalid index '" << index_str << "': " << e.what() <<" of data: " << data << std::endl;
+            rand_idx = -1;
+        }
+
         rand_nodes.push_back(rand_idx);
 
         m_append(data);
