@@ -26,7 +26,7 @@ int main(int argc, char* argv[])
         dparser.Set_file_out_path(output_file);
     }
     dparser.Parse();
-    dparser.Info();
     dparser.Serialize();
-    dparser.PrintDlist();
+    dparser.Info();
+    //dparser.PrintDlist();
 }

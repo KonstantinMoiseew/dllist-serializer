@@ -8,8 +8,6 @@
 #include <fstream>
 #include <sstream>
 
-
-
 DParser::DParser(DList* dlist): m_dlist(dlist) {
         std::error_code ec;
         std::filesystem::path canonical_path_in = std::filesystem::canonical("./res/inlet.in", ec);
@@ -87,7 +85,6 @@ void DParser::m_split(){
 void DParser::Parse(){
     m_split();
 
-    std::cout << "Splitting: " << std::endl;
     int line_counter = 1;
     
     for (auto t : m_string_line) {
@@ -179,23 +176,21 @@ void DParser::Parse(){
     }
     
     // Set random pointers
-    std::vector<int> rand_nodes;
-    for (auto& info : m_info_list) {
-        rand_nodes.push_back(info.rand_idx);
-    }
-    
-    for (int i = 0; i < rand_nodes.size(); i++) {
+    for (size_t i = 0; i < m_info_list.size(); i++) {
         ListNode* node = m_dlist->m_go_to(i);
-        if (rand_nodes[i] != -1) {
-            if(node) node->rand = m_dlist->m_go_to(rand_nodes[i]);
-        } else {
-            node->rand = nullptr;
+        if (node) {
+            node->rand = (m_info_list[i].rand_idx != -1) ? m_dlist->m_go_to(m_info_list[i].rand_idx) : nullptr;
+            if(!m_dlist->m_error_msg.empty()){
+                m_info_list[i].msg = m_info_list[i].msg + m_dlist->GetErrMsg() + " в строке: " + std::to_string(m_info_list[i].file_line_number);
+                m_dlist->ClearErrMsg();
+            }
         }
     }
 
 }
 
 void DParser::Info(){
+    std::cout << "Info: " << std::endl;
     for(auto inf: m_info_list){
         if(inf.msg.empty()){
 

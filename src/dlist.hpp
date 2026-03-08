@@ -7,6 +7,9 @@ class DList {
         DList(); // Empty List
         ~DList(); // Delete all nodes
 
+        std::string GetErrMsg();
+        void ClearErrMsg();
+
         // Position access
         ListNode* m_get_head() const;
         ListNode* m_get_tail() const;
@@ -39,6 +42,7 @@ class DList {
         ListNode* m_tail;
         ListNode* m_temp;
         ListNode* m_first;
+        std::string m_error_msg;
 
         int m_size = 0;
 

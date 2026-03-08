@@ -210,6 +210,7 @@ void DList::m_remove_position(int pos) {
     // If invalid position
     if (pos < 0 || pos >= m_size) {
         std::cout <<"Please enter a valid position (from 0 to " << m_size-1 << ")"  << std::endl;
+        //m_error_msg = "Rand индекс вне диапазона от 0 до " + std::to_string(m_size-1) +  " Pos for rand: "  + std::to_string(pos);
     }
 
     else if(pos == 0) {
@@ -252,7 +253,8 @@ ListNode* DList::m_find(const std::string& data){
 
 ListNode* DList::m_go_to(int pos){
     if (pos < 0 || pos > m_size - 1) {
-        std::cout <<"Please enter a valid position (from 0 to " << m_size-1 << ")"  << " Pos for rand: " << pos << std::endl;
+        //std::cout <<"Please enter a valid position (from 0 to " << m_size-1 << ")"  << " Pos for rand: " << pos << std::endl;
+        m_error_msg = "Rand индекс вне диапазона от 0 до " + std::to_string(m_size-1) +  " Pos for rand: "  + std::to_string(pos);
         return nullptr;
     }  
     if(pos == m_size - 1){
@@ -296,6 +298,14 @@ void DList::m_print_backward() const {
     current = current->prev;
     }
 
+}
+
+std::string DList::GetErrMsg(){
+    return m_error_msg;
+}
+
+void DList::ClearErrMsg(){
+    m_error_msg = "";
 }
 
 
