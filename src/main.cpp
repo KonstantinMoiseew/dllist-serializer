@@ -18,18 +18,15 @@ int main(int argc, char* argv[])
         }
     }
     
-    DList* list = new DList();
+    DParser dparser;
     if(!input_file.empty()){
-        list->Set_file_in_path(input_file);
+        dparser.Set_file_in_path(input_file);
     }
     if(!output_file.empty()){
-        list->Set_file_out_path(output_file);
+        dparser.Set_file_out_path(output_file);
     }
-    //list->ReadFileIn();
-    //list->Serialize();
-
-    DParser dparser;
     dparser.Parse();
     dparser.Info();
-    
+    dparser.Serialize();
+    dparser.PrintDlist();
 }

@@ -3,15 +3,37 @@
 #include <unistd.h>
 #include <iostream>
 #include <cstring>
+#include <filesystem>
+#include <iostream>
+#include <fstream>
+#include <sstream>
 
 
 
 DParser::DParser(DList* dlist): m_dlist(dlist) {
+        std::error_code ec;
+        std::filesystem::path canonical_path_in = std::filesystem::canonical("./res/inlet.in", ec);
+        if (ec) {
+            std::cerr << "Canonical failed: " << ec.message() << std::endl;
+            m_file_in_full_path = "../res/inlet.in";  // Fallback
+        } else {
+            m_file_in_full_path = canonical_path_in.string();
+        }
+
+        std::filesystem::path canonical_path_out = std::filesystem::canonical("./res/outlet.out", ec);
+        if (ec) {
+            std::cerr << "Canonical failed: " << ec.message() << std::endl;
+            m_file_out_full_path = "../res/outlet.out";  // Fallback
+        } else {
+         m_file_out_full_path = canonical_path_out.string();
+        }
+    
+        std::cout << "Working dir: " << std::filesystem::current_path() << std::endl; //working dir (pwd) inherits from parent process.
 
 }
 DParser::~DParser(){}
 void DParser::m_read_fileIn(){
-    int fd = open("/home/const/repos/double_linked_list/dllist-serializer/res/inlet.in", O_RDONLY);
+    int fd = open(m_file_in_full_path.c_str(), O_RDONLY);
     if(fd == -1){
         std::cout << "Failed to open file: " << "./res/inlet.in, fd= " <<  fd << std::endl;
         return;
@@ -183,4 +205,62 @@ void DParser::Info(){
         }
 
     }
+}
+
+bool DParser::Serialize()
+{
+
+    std::cout << "File output: " << m_file_out_full_path << std::endl;
+    std::fstream file(m_file_out_full_path);
+    if (!file.is_open()) {
+        std::cerr << "Failed to open " << m_file_out_full_path << std::endl;
+        return false;
+    }
+
+    uint32_t size = m_dlist->m_get_size();
+    file.write(reinterpret_cast<const char*>(&size), sizeof(size));
+
+    // Проходим по списку и сериализуем каждый узел
+    ListNode* current = m_dlist->m_get_head();
+    for (uint32_t i = 0; i < size && current; ++i, current = current->next) {
+        // data: длина строки (uint32_t) + строка (UTF-8)
+        uint32_t data_len = current->data.length();
+        file.write(reinterpret_cast<const char*>(&data_len), sizeof(data_len));
+        file.write(current->data.c_str(), data_len);
+        
+        // rand_index: int32_t (-1 для nullptr)
+        int32_t rand_idx = -1;
+        if (current->rand) {
+            // Находим индекс узла на который указывает rand
+            ListNode* temp = m_dlist->m_get_head();
+            for (int32_t j = 0; j < m_dlist->m_get_size() && temp; ++j, temp = temp->next) {
+                if (temp == current->rand) {
+                    rand_idx = j;
+                    break;
+                }
+            }
+        }
+        file.write(reinterpret_cast<const char*>(&rand_idx), sizeof(rand_idx));
+    }
+    if (!file) {
+        std::cerr << "Write error during serialization\n";
+        return false;
+    }
+    
+    std::cout << "Serialized " << size << " nodes to outlet.out\n";
+
+    return true;
+
+}
+
+void DParser::PrintDlist(){
+    m_dlist->m_print_forward();
+}
+
+void DParser::Set_file_in_path(const std::string& filename){
+    m_file_in_full_path = filename;
+}
+
+void DParser::Set_file_out_path(const std::string& filename){
+    m_file_out_full_path = filename;
 }

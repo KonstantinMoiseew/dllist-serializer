@@ -11,24 +11,7 @@ DList::DList(): m_head(nullptr)
             , m_temp(nullptr)
             , m_first(nullptr)
             , m_size(0){
-    std::error_code ec;
-    std::filesystem::path canonical_path_in = std::filesystem::canonical("./res/inlet.in", ec);
-    if (ec) {
-        std::cerr << "Canonical failed: " << ec.message() << std::endl;
-        m_file_in_full_path = "../res/inlet.in";  // Fallback
-    } else {
-        m_file_in_full_path = canonical_path_in.string();
-    }
 
-    std::filesystem::path canonical_path_out = std::filesystem::canonical("./res/outlet.out", ec);
-    if (ec) {
-        std::cerr << "Canonical failed: " << ec.message() << std::endl;
-        m_file_out_full_path = "../res/outlet.out";  // Fallback
-    } else {
-        m_file_out_full_path = canonical_path_out.string();
-    }
-    
-    std::cout << "Working dir: " << std::filesystem::current_path() << std::endl; //working dir (pwd) inherits from parent process.
 }
 
 
@@ -42,139 +25,6 @@ DList::~DList()
     }
 }
 
-bool DList::Serialize()
-{
-
-    std::cout << "File output: " << m_file_out_full_path << std::endl;
-    std::fstream file(m_file_out_full_path);
-    if (!file.is_open()) {
-        std::cerr << "Failed to open " << m_file_out_full_path << std::endl;
-        return false;
-    }
-
-    uint32_t size = m_get_size();
-    file.write(reinterpret_cast<const char*>(&size), sizeof(size));
-
-    // Проходим по списку и сериализуем каждый узел
-    ListNode* current = m_get_head();
-    for (uint32_t i = 0; i < size && current; ++i, current = current->next) {
-        // data: длина строки (uint32_t) + строка (UTF-8)
-        uint32_t data_len = current->data.length();
-        file.write(reinterpret_cast<const char*>(&data_len), sizeof(data_len));
-        file.write(current->data.c_str(), data_len);
-        
-        // rand_index: int32_t (-1 для nullptr)
-        int32_t rand_idx = -1;
-        if (current->rand) {
-            // Находим индекс узла на который указывает rand
-            ListNode* temp = m_get_head();
-            for (int32_t j = 0; j < m_get_size() && temp; ++j, temp = temp->next) {
-                if (temp == current->rand) {
-                    rand_idx = j;
-                    break;
-                }
-            }
-        }
-        file.write(reinterpret_cast<const char*>(&rand_idx), sizeof(rand_idx));
-    }
-    if (!file) {
-        std::cerr << "Write error during serialization\n";
-        return false;
-    }
-    
-    std::cout << "Serialized " << size << " nodes to outlet.out\n";
-
-    return true;
-
-}
-
-bool DList::Deserialize(){
-    return true;
-}
-
-bool DList::ReadFileIn(){
-    std::cout << "File input: " << m_file_in_full_path << std::endl;
-    std::fstream file(m_file_in_full_path);
-    if (!file.is_open()) {
-    std::cerr << "Failed to open " << m_file_in_full_path << std::endl;
-    return false;
-    }
-
-    std::string line;
-    int line_number = 0;
-    std::vector<int> rand_nodes;
-    while (std::getline(file, line)) {
-        line_number++;
-        if (line.empty()) {
-            std::cout << "Line " << line_number << ": empty line skipped" << std::endl;
-            continue;
-        }
-    
-        std::istringstream iss(line);
-        std::string data, index_str;
-        if (!std::getline(iss, data, ';') || !std::getline(iss, index_str, ';')) {
-            std::cerr << "Line " << line_number << " WRONG FORMAT (need data;index): '" 
-                      << line << std::endl;
-            std::cout << "Проверьте правильность формата входного файла.\n";
-            continue; 
-        }
-
-        // УДАЛЯЕМ ЛИШНИЕ СИМВОЛЫ ИЗ index_str
-        index_str.erase(std::remove_if(index_str.begin(), index_str.end(), ::isspace), index_str.end());
-
-        if (index_str.empty()) {
-            std::cerr << "Line " << line_number << " EMPTY INDEX after ';': '" << line << std::endl;
-            std::cout << "Проверьте правильность формата входного файла." << std::endl;
-            continue;
-        }
-    
-        int rand_idx;
-        try {
-            rand_idx = std::stoi(index_str);
-            
-            // rand_idx должен быть в правильном диапазоне (0..10^6)
-            if (rand_idx < -1 || rand_idx >= 1000000) {  // Больше MAX_NODES
-                std::cerr << "Line " << line_number << " INDEX OUT OF RANGE: " << rand_idx << std::endl;
-                std::cout << "Проверьте правильность формата входного файла." << std::endl;
-                continue;
-            }
-            
-        } catch (const std::exception& e) {
-            std::cerr << "Line " << line_number << " INVALID INDEX '" << index_str 
-                      << "' for data '" << data << "': " << e.what() << std::endl;
-            std::cout << "Проверьте правильность формата входного файла." << std::endl;
-            continue;  // НЕ добавляем узел!
-        }
-
-        rand_nodes.push_back(rand_idx);
-
-        m_append(data);
-
-        if (rand_nodes.size() != static_cast<size_t>(m_get_size())) {
-            std::cerr << "ERROR: parsed " << rand_nodes.size() 
-                  << " valid lines, but m_size = " << m_get_size() << std::endl;
-            return false;
-        }
-    }
-    ListNode* node = nullptr;
-    for (int i = 0; i < rand_nodes.size(); i++){
-        node = m_go_to(i);
-        if(node == nullptr){
-            std::cout << " Line: " << i << std::endl;
-        }
-        if(rand_nodes[i] != -1){
-            node->rand = m_go_to(rand_nodes[i]);
-            if(node->rand == nullptr){
-                std::cout << "Position in dlist: " << i << std::endl;
-            }
-        }
-            
-        else
-            node->rand = nullptr;
-
-    }
-    return true;
-}
 
 /*
     Private Methods
@@ -448,19 +298,5 @@ void DList::m_print_backward() const {
 
 }
 
-bool DList::m_read_file(const std::string& filename){
-    return true;
-}
 
-bool DList::m_write_file(const std::string& filename) const{
-    return true;
-}
-
-void DList::Set_file_in_path(const std::string& filename){
-    m_file_in_full_path = filename;
-}
-
-void DList::Set_file_out_path(const std::string& filename){
-    m_file_out_full_path = filename;
-}
 
