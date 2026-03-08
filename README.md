@@ -44,10 +44,16 @@ CMake не ниже 3.20 версии.
 
 ## Порядок сборки.
 Склонировать проект `git clone https://github.com/KonstantinMoiseew/dllist-serializer.git`
-Перейти в дирректорию dllist-serializer `cd current_dir/dllist-serializer`  
+Перейти в дирректорию dllist-serializer `cd current_dir/dllist-serializer` 
+Перейти на ветку dlist_lowlevel_parsing `git checkout dlist_lowlevel_parsing`
 Сконфигурировать проект: `cmake -S . -B ./build -DCMAKE_BUILD_TYPE=Release -G Ninja`
 Собрать проект: `cmake --build ./build`
 
 ## Запустить проект:
 Из той же директории выполнить: `./build/dlinked_list_serial -in relative_path_to/input_file -out relative_path_to/output_file`
 где после параметров -in и -out идут относительные или полные пути к входному и выходному файлу (относительно рабочей дирректории). По умолчанию значения путей ./res/inlet.in и ./res/outlet.out.
+
+##Примечания.
+В ветке main применяется STL для парсинга входного файла. До конца не доделанно.
+В ветке dlist_lowlevel_parsing применяется библиотека glibc и работа с указателями для парсинга входного файла.
+Выполненно полностью. Есть вывод ошибок и ниформации, которые собирались во время парсинга входного файла.
