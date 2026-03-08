@@ -28,9 +28,7 @@ int main(int argc, char* argv[])
     list->ReadFileIn();
     list->Serialize();
 
-    DParser dparser;
-    dparser.ReadFileIn();
-
-
+    //DParser dparser;
+    //dparser.Parse();
     
 }
