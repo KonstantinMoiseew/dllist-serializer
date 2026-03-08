@@ -14,6 +14,7 @@ public:
     DParser(DList* dlist = new DList());
     ~DParser();
     void Parse();
+    void Info();
     
 
 private:

@@ -66,7 +66,7 @@ void DParser::Parse(){
     m_split();
 
     std::cout << "Splitting: " << std::endl;
-    int line_counter = 0;
+    int line_counter = 1;
     
     for (auto t : m_string_line) {
         char* tmp_ptr = t;
@@ -149,14 +149,14 @@ void DParser::Parse(){
         // SUCCESS: Add to list
         m_dlist->m_append(data);
         inf_list.rand_idx = rand_idx;
-        inf_list.msg = "Строка " + std::to_string(line_counter) + " OK";
+        inf_list.msg = "";
         m_info_list.push_back(inf_list);
         
         line_counter++;
         delete[] index_str;  // data managed by m_dlist
     }
     
-    // Set random pointers (same as original)
+    // Set random pointers
     std::vector<int> rand_nodes;
     for (auto& info : m_info_list) {
         rand_nodes.push_back(info.rand_idx);
@@ -165,10 +165,22 @@ void DParser::Parse(){
     for (int i = 0; i < rand_nodes.size(); i++) {
         ListNode* node = m_dlist->m_go_to(i);
         if (rand_nodes[i] != -1) {
-            node->rand = m_dlist->m_go_to(rand_nodes[i]);
+            if(node) node->rand = m_dlist->m_go_to(rand_nodes[i]);
         } else {
             node->rand = nullptr;
         }
     }
 
+}
+
+void DParser::Info(){
+    for(auto inf: m_info_list){
+        if(inf.msg.empty()){
+
+        }else{
+            std::cout << "Line number: " << inf.file_line_number << ": " << std::endl;
+            std::cout << inf.msg <<  std::endl;
+        }
+
+    }
 }

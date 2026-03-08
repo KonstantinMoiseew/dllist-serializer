@@ -25,10 +25,11 @@ int main(int argc, char* argv[])
     if(!output_file.empty()){
         list->Set_file_out_path(output_file);
     }
-    list->ReadFileIn();
-    list->Serialize();
+    //list->ReadFileIn();
+    //list->Serialize();
 
-    //DParser dparser;
-    //dparser.Parse();
+    DParser dparser;
+    dparser.Parse();
+    dparser.Info();
     
 }
