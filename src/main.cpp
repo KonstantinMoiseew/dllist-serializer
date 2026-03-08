@@ -1,5 +1,6 @@
 #include <iostream>
 #include "dlist.hpp"
+#include "dparser.hpp"
 
 int main(int argc, char* argv[])
 {
@@ -26,5 +27,10 @@ int main(int argc, char* argv[])
     }
     list->ReadFileIn();
     list->Serialize();
+
+    DParser dparser;
+    dparser.ReadFileIn();
+
+
     
 }

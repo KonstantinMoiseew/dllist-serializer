@@ -8,7 +8,8 @@ project(dlinked_list_serial C CXX)
 
 set(SRC 
 "src/main.cpp" 
-"src/dlist.cpp"   
+"src/dlist.cpp" 
+"src/dparser.cpp"  
 )
 
 add_executable(dlinked_list_serial ${SRC})
