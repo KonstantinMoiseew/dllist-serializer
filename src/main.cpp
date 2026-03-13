@@ -27,6 +27,6 @@ int main(int argc, char* argv[])
     }
     dparser.Parse();
     dparser.Serialize();
-    dparser.Info();
-    //dparser.PrintDlist();
+    //dparser.Info();
+    dparser.PrintDlist();
 }

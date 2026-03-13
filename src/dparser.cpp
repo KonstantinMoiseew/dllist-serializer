@@ -29,7 +29,12 @@ DParser::DParser(DList* dlist): m_dlist(dlist) {
         std::cout << "Working dir: " << std::filesystem::current_path() << std::endl; //working dir (pwd) inherits from parent process.
 
 }
-DParser::~DParser(){}
+DParser::~DParser(){
+    for (auto line : m_string_line) {
+        delete[] line;
+    }
+    m_string_line.clear();
+}
 void DParser::m_read_fileIn(){
     int fd = open(m_file_in_full_path.c_str(), O_RDONLY);
     if(fd == -1){
@@ -37,27 +42,29 @@ void DParser::m_read_fileIn(){
         return;
     }
     char** bufs;
-    m_parsed_buf = new char[1000000];
-    char buf[10] = {0};
+    constexpr size_t BUFFER_SIZE = 64 * 1024;
+    char buf[BUFFER_SIZE] = {0};
     int pos = 0;
     size_t rd; 
-    while((rd = read(fd, buf, 10)) > 0)
+    while((rd = read(fd, buf, BUFFER_SIZE - 1)) > 0)
     {
-        memcpy(m_parsed_buf + pos, buf, rd);
+        m_parsed_buf.resize(pos + rd);
+        memcpy(m_parsed_buf.data() + pos, buf, rd);
         pos = pos + rd;
     }
-
-    m_parsed_buf[pos +1] = '\0'; //m_parsed_buf[pos] = '\n'; LF symbol 0A
+    m_parsed_buf.resize(pos + 1);
+    m_parsed_buf[pos] = '\0';
+    //m_parsed_buf[pos +1] = '\0'; //m_parsed_buf[pos] = '\n'; LF symbol 0A
     //std::cout << "m_parsed_buf: " << m_parsed_buf << std::endl;
-
+    close(fd);
 }
 
 void DParser::m_split(){
 
     m_read_fileIn();
-    if (m_parsed_buf == nullptr) return;
+    if (m_parsed_buf.empty()) return;
 
-    char* ptr = m_parsed_buf;
+    char* ptr = m_parsed_buf.data();
     
     while (*ptr) {  // Пока не конец строки
         char* line_start = ptr;     // Начало строки
@@ -117,10 +124,12 @@ void DParser::Parse(){
         }
         
         // Extract DATA (before ';')
-        size_t data_len = index_start - data_start;
+        size_t data_len = index_start - data_start -1;
         char* data = new char[data_len + 1];
         memcpy(data, data_start, data_len);
         data[data_len] = '\0';
+
+        std::cout << "data: " << data << std::endl;
         
         // Extract INDEX (after ';')
         char* index_end = index_start;
@@ -166,20 +175,22 @@ void DParser::Parse(){
         }
         
         // SUCCESS: Add to list
-        m_dlist->m_append(data);
+        m_dlist->Append(data);
         inf_list.rand_idx = rand_idx;
         inf_list.msg = "";
         m_info_list.push_back(inf_list);
         
         line_counter++;
+        delete[] data;
         delete[] index_str;  // data managed by m_dlist
     }
     
     // Set random pointers
     for (size_t i = 0; i < m_info_list.size(); i++) {
-        ListNode* node = m_dlist->m_go_to(i);
+        ListNode* node = m_dlist->Go_to(i);
         if (node) {
-            node->rand = (m_info_list[i].rand_idx != -1) ? m_dlist->m_go_to(m_info_list[i].rand_idx) : nullptr;
+            node->rand = (m_info_list[i].rand_idx != -1) ? m_dlist->Go_to(m_info_list[i].rand_idx) : nullptr;
+
             if(!m_dlist->m_error_msg.empty()){
                 m_info_list[i].msg = m_info_list[i].msg + m_dlist->GetErrMsg() + " в строке: " + std::to_string(m_info_list[i].file_line_number);
                 m_dlist->ClearErrMsg();
@@ -212,11 +223,11 @@ bool DParser::Serialize()
         return false;
     }
 
-    uint32_t size = m_dlist->m_get_size();
+    uint32_t size = m_dlist->Get_size();
     file.write(reinterpret_cast<const char*>(&size), sizeof(size));
 
     // Проходим по списку и сериализуем каждый узел
-    ListNode* current = m_dlist->m_get_head();
+    ListNode* current = m_dlist->Get_head();
     for (uint32_t i = 0; i < size && current; ++i, current = current->next) {
         // data: длина строки (uint32_t) + строка (UTF-8)
         uint32_t data_len = current->data.length();
@@ -227,8 +238,8 @@ bool DParser::Serialize()
         int32_t rand_idx = -1;
         if (current->rand) {
             // Находим индекс узла на который указывает rand
-            ListNode* temp = m_dlist->m_get_head();
-            for (int32_t j = 0; j < m_dlist->m_get_size() && temp; ++j, temp = temp->next) {
+            ListNode* temp = m_dlist->Get_head();
+            for (int32_t j = 0; j < m_dlist->Get_size() && temp; ++j, temp = temp->next) {
                 if (temp == current->rand) {
                     rand_idx = j;
                     break;
@@ -249,7 +260,7 @@ bool DParser::Serialize()
 }
 
 void DParser::PrintDlist(){
-    m_dlist->m_print_forward();
+    m_dlist->Print_forward();
 }
 
 void DParser::Set_file_in_path(const std::string& filename){

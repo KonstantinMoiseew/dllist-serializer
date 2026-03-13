@@ -23,6 +23,7 @@ DList::~DList()
     delete current;
     current = next;
     }
+    if(m_temp) delete m_temp;
 }
 
 
@@ -31,18 +32,18 @@ DList::~DList()
 */
 
 // Position access
-ListNode* DList::m_get_head() const {
+ListNode* DList::Get_head() const {
     return m_head;
 }
-ListNode* DList::m_get_tail() const {
+ListNode* DList::Get_tail() const {
     return m_tail;
 }
-int DList::m_get_size() const {
+int DList::Get_size() const {
     return m_size;
 }
 
 // Insert
-void DList::m_append(const std::string& data, ListNode* node) {
+void DList::Append(const std::string& data, ListNode* node) {
 
     if (m_size >= MAX_NODES) {
         std::cerr << "ERROR: Maximum nodes limit reached (" << MAX_NODES << ")\n";
@@ -70,8 +71,9 @@ void DList::m_append(const std::string& data, ListNode* node) {
         m_tail = newNode;
     }
     m_size++;
+    m_nodes.push_back(newNode);
 }
-void DList::m_prepend(const std::string& data, ListNode* node) {
+void DList::Prepend(const std::string& data, ListNode* node) {
 
     if (m_size >= MAX_NODES) {
         std::cerr << "ERROR: Maximum nodes limit reached (" << MAX_NODES << ")\n";
@@ -98,8 +100,9 @@ void DList::m_prepend(const std::string& data, ListNode* node) {
         m_head = newNode;
     }
     m_size++;
+    m_nodes.insert(m_nodes.begin(), newNode);
 }
-void DList::m_insert_after(const std::string& data, int pos, ListNode* node)
+void DList::Insert_after(const std::string& data, int pos, ListNode* node)
 {
     if (m_size >= MAX_NODES) {
         std::cerr << "ERROR: Maximum nodes limit reached (" << MAX_NODES << ")\n";
@@ -111,7 +114,7 @@ void DList::m_insert_after(const std::string& data, int pos, ListNode* node)
         return;  // Не добавляем больше узлов
     }
     
-    m_temp = this->m_go_to(pos);
+    m_temp = this->Go_to(pos);
     if(!m_temp){
         return;
     }
@@ -135,7 +138,7 @@ void DList::m_insert_after(const std::string& data, int pos, ListNode* node)
 
 }
 
-void DList::m_insert_before(const std::string& data, int pos, ListNode* node){
+void DList::Insert_before(const std::string& data, int pos, ListNode* node){
 
     if (m_size >= MAX_NODES) {
         std::cerr << "ERROR: Maximum nodes limit reached (" << MAX_NODES << ")\n";
@@ -145,7 +148,7 @@ void DList::m_insert_before(const std::string& data, int pos, ListNode* node){
         std::cerr << "ERROR: Maximum data length limit reached (" << MAX_LENGTH << ")\n";
         return;  // Не добавляем больше узлов
     }
-    m_temp = this->m_go_to(pos);
+    m_temp = this->Go_to(pos);
     if(!m_temp){
         return;
     }
@@ -169,7 +172,7 @@ void DList::m_insert_before(const std::string& data, int pos, ListNode* node){
 }
 
 // Remove
-void DList::m_remove_head() {
+void DList::Remove_head() {
     if(m_head == nullptr) 
     {
         std::cout << "Can not remove! The list is empty." << std::endl;
@@ -187,7 +190,7 @@ void DList::m_remove_head() {
     m_size--;
     delete m_temp;
 }
-void DList::m_remove_tail() {
+void DList::Remove_tail() {
     if(m_head == nullptr) 
     {
         std::cout << "Can not remove! The list is empty." << std::endl;
@@ -206,7 +209,7 @@ void DList::m_remove_tail() {
     m_size--;
     delete m_temp;
 }
-void DList::m_remove_position(int pos) {
+void DList::Remove_position(int pos) {
     // If invalid position
     if (pos < 0 || pos >= m_size) {
         std::cout <<"Please enter a valid position (from 0 to " << m_size-1 << ")"  << std::endl;
@@ -214,10 +217,10 @@ void DList::m_remove_position(int pos) {
     }
 
     else if(pos == 0) {
-        m_remove_head();
+        Remove_head();
     }
     else if(pos == m_size - 1) { 
-        m_remove_tail();
+        Remove_tail();
     }  
     else {
         m_first = m_head;
@@ -238,7 +241,7 @@ void DList::m_remove_position(int pos) {
 }
 
 // Search/position
-ListNode* DList::m_find(const std::string& data){
+ListNode* DList::Find(const std::string& data){
     if (m_head == nullptr) {
         std::cout <<"DList is empty" << std::endl;
         return nullptr;
@@ -251,7 +254,7 @@ ListNode* DList::m_find(const std::string& data){
     return nullptr; 
 } 
 
-ListNode* DList::m_go_to(int pos){
+ListNode* DList::Go_to(int pos){
     if (pos < 0 || pos > m_size - 1) {
         //std::cout <<"Please enter a valid position (from 0 to " << m_size-1 << ")"  << " Pos for rand: " << pos << std::endl;
         m_error_msg = "Rand индекс вне диапазона от 0 до " + std::to_string(m_size-1) +  " Pos for rand: "  + std::to_string(pos);
@@ -263,31 +266,25 @@ ListNode* DList::m_go_to(int pos){
     if(pos == 0){
         return m_head;
     }   
-    m_first = m_head;
-    while(pos-- > 0){
-        m_first = m_first->next;
-        if(m_first == nullptr){
-            std::cout << "There is no such a node. " << std::endl;
-            return m_first;
-        }
-    }   
-    return m_first; 
+    return m_nodes[pos];
 }  
 
 // Traversal helpers
-void DList::m_print_forward() const {
+void DList::Print_forward() const {
     if(m_head == nullptr)
     {
         std::cout << "List is empty" << std::endl;
     }
+    int index = 1;
     ListNode* current = m_head;
     while (current != nullptr) {
-        std::cout << current->data << std::endl;
+        std::cout << index << ": " << current->data << "; ";
         std::cout << "Rand: " << current->rand << std::endl;
         current = current->next;
+        index++;
     }
 }
-void DList::m_print_backward() const {
+void DList::Print_backward() const {
     if(m_head == nullptr)
     {
         std::cout << "List is empty" << std::endl;

@@ -24,12 +24,14 @@ public:
 
 private:
     char* m_file_path;
-    char* m_parsed_buf;
+    std::string m_parsed_buf;
     void m_read_fileIn();
     std::vector<char*> m_string_line;
     std::vector<InfoDList> m_info_list;
     std::string m_file_in_full_path;
     std::string m_file_out_full_path;
+
+
 
     void m_split();
     DList* m_dlist;
